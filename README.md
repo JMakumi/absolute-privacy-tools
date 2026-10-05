@@ -168,4 +168,6 @@ Select a tool from the home page and start processing a document.
 
 ## License
 
-This project is not licenced.
+This project is licensed under the [MIT License](LICENSE).
+
+Third-party dependencies are distributed under their respective licenses. See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for details.
