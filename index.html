@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Local Developer & Business Tools</title>
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --success: #059669;
+            --success-dark: #047857;
+            --text: #111827;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --background: #f3f6fa;
+            --card: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Arial,
+                sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at top left,
+                    #e8f0ff 0,
+                    transparent 35%
+                ),
+                var(--background);
+
+            color: var(--text);
+
+            display: flex;
+            justify-content: center;
+            padding: 60px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+        }
+
+        /* --------------------------------------------------
+           Header
+        -------------------------------------------------- */
+
+        .header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .logo {
+            width: 64px;
+            height: 64px;
+
+            margin: 0 auto 18px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 18px;
+
+            background: linear-gradient(
+                135deg,
+                var(--primary),
+                #6366f1
+            );
+
+            color: white;
+            font-size: 30px;
+
+            box-shadow:
+                0 12px 30px rgba(37, 99, 235, 0.25);
+        }
+
+        h1 {
+            margin: 0;
+
+            font-size: 34px;
+            line-height: 1.2;
+            font-weight: 750;
+
+            letter-spacing: -0.8px;
+        }
+
+        .subtitle {
+            margin: 12px auto 0;
+
+            max-width: 620px;
+
+            color: var(--muted);
+
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* --------------------------------------------------
+           Privacy badge
+        -------------------------------------------------- */
+
+        .privacy-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+
+            margin-top: 18px;
+
+            padding: 8px 14px;
+
+            border-radius: 999px;
+
+            background: #ecfdf5;
+            color: #047857;
+
+            border: 1px solid #a7f3d0;
+
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .privacy-dot {
+            width: 8px;
+            height: 8px;
+
+            border-radius: 50%;
+
+            background: #10b981;
+        }
+
+        /* --------------------------------------------------
+           Tools section
+        -------------------------------------------------- */
+
+        .section-title {
+            margin: 0 0 16px;
+
+            font-size: 14px;
+            font-weight: 700;
+
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+
+            color: #6b7280;
+        }
+
+        .tools {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 16px;
+        }
+
+        /* --------------------------------------------------
+           Tool card
+        -------------------------------------------------- */
+
+        .tool {
+            position: relative;
+
+            display: flex;
+            align-items: center;
+
+            gap: 16px;
+
+            padding: 20px;
+
+            background: var(--card);
+
+            border: 1px solid var(--border);
+
+            border-radius: 14px;
+
+            text-decoration: none;
+            color: inherit;
+
+            box-shadow:
+                0 3px 10px rgba(15, 23, 42, 0.04);
+
+            transition:
+                transform 0.18s ease,
+                box-shadow 0.18s ease,
+                border-color 0.18s ease;
+        }
+
+        .tool:hover {
+            transform: translateY(-3px);
+
+            border-color: #bfdbfe;
+
+            box-shadow:
+                0 12px 28px rgba(15, 23, 42, 0.10);
+        }
+
+        .tool:active {
+            transform: translateY(-1px);
+        }
+
+        /* --------------------------------------------------
+           Icon
+        -------------------------------------------------- */
+
+        .tool-icon {
+            flex-shrink: 0;
+
+            width: 48px;
+            height: 48px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 12px;
+
+            background: #eff6ff;
+
+            font-size: 23px;
+        }
+
+        .tool:nth-child(2) .tool-icon {
+            background: #f0fdf4;
+        }
+
+        .tool:nth-child(3) .tool-icon {
+            background: #fff7ed;
+        }
+
+        .tool:nth-child(4) .tool-icon {
+            background: #faf5ff;
+        }
+
+        .tool:nth-child(5) .tool-icon {
+            background: #fef2f2;
+        }
+
+        /* --------------------------------------------------
+           Tool content
+        -------------------------------------------------- */
+
+        .tool-content {
+            min-width: 0;
+        }
+
+        .tool-title {
+            margin: 0 0 4px;
+
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .tool-description {
+            margin: 0;
+
+            color: var(--muted);
+
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        /* --------------------------------------------------
+           Arrow
+        -------------------------------------------------- */
+
+        .arrow {
+            margin-left: auto;
+
+            color: #9ca3af;
+
+            font-size: 20px;
+
+            transition:
+                transform 0.18s ease,
+                color 0.18s ease;
+        }
+
+        .tool:hover .arrow {
+            transform: translateX(4px);
+            color: var(--primary);
+        }
+
+        /* --------------------------------------------------
+           Footer
+        -------------------------------------------------- */
+
+        .footer {
+            margin-top: 32px;
+
+            padding-top: 20px;
+
+            border-top: 1px solid var(--border);
+
+            text-align: center;
+
+            color: #9ca3af;
+
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* --------------------------------------------------
+           Responsive
+        -------------------------------------------------- */
+
+        @media (max-width: 650px) {
+
+            body {
+                padding: 35px 16px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .tools {
+                grid-template-columns: 1fr;
+            }
+
+            .tool {
+                padding: 18px;
+            }
+        }
+
+        @media (max-width: 400px) {
+
+            .logo {
+                width: 56px;
+                height: 56px;
+
+                font-size: 26px;
+            }
+
+            h1 {
+                font-size: 25px;
+            }
+
+            .subtitle {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- Header -->
+
+    <header class="header">
+
+        <div class="logo">
+            🛠️
+        </div>
+
+        <h1>
+            Local Developer & Business Tools
+        </h1>
+
+        <p class="subtitle">
+            Practical tools for working with documents and data,
+            designed to run locally without relying on third-party
+            processing services.
+        </p>
+
+        <div class="privacy-badge">
+            <span class="privacy-dot"></span>
+            Private by design · Local processing
+        </div>
+
+    </header>
+
+
+    <!-- PDF Tools -->
+
+    <section>
+
+        <p class="section-title">
+            PDF Tools
+        </p>
+
+        <div class="tools">
+
+            <a
+                href="pdftools/pdf-compressor/pdf-compressor.html"
+                class="tool"
+            >
+
+                <div class="tool-icon">
+                    📦
+                </div>
+
+                <div class="tool-content">
+
+                    <h2 class="tool-title">
+                        Compress PDF
+                    </h2>
+
+                    <p class="tool-description">
+                        Reduce PDF file size while targeting
+                        a specific output size.
+                    </p>
+
+                </div>
+
+                <span class="arrow">
+                    →
+                </span>
+
+            </a>
+
+
+            <a
+                href="pdftools/merge.html"
+                class="tool"
+            >
+
+                <div class="tool-icon">
+                    🔗
+                </div>
+
+                <div class="tool-content">
+
+                    <h2 class="tool-title">
+                        Merge PDF
+                    </h2>
+
+                    <p class="tool-description">
+                        Combine multiple PDF documents into
+                        a single file.
+                    </p>
+
+                </div>
+
+                <span class="arrow">
+                    →
+                </span>
+
+            </a>
+
+
+            <a
+                href="pdftools/split.html"
+                class="tool"
+            >
+
+                <div class="tool-icon">
+                    ✂️
+                </div>
+
+                <div class="tool-content">
+
+                    <h2 class="tool-title">
+                        Split PDF
+                    </h2>
+
+                    <p class="tool-description">
+                        Extract selected pages from a PDF
+                        into separate documents.
+                    </p>
+
+                </div>
+
+                <span class="arrow">
+                    →
+                </span>
+
+            </a>
+
+
+            <a
+                href="pdftools/image2pdf.html"
+                class="tool"
+            >
+
+                <div class="tool-icon">
+                    🖼️
+                </div>
+
+                <div class="tool-content">
+
+                    <h2 class="tool-title">
+                        Image to PDF
+                    </h2>
+
+                    <p class="tool-description">
+                        Convert images into a convenient
+                        PDF document.
+                    </p>
+
+                </div>
+
+                <span class="arrow">
+                    →
+                </span>
+
+            </a>
+
+
+            <a
+                href="pdftools/esign.html"
+                class="tool"
+            >
+
+                <div class="tool-icon">
+                    📝
+                </div>
+
+                <div class="tool-content">
+
+                    <h2 class="tool-title">
+                        eSign
+                    </h2>
+
+                    <p class="tool-description">
+                        Sign pdf documents elecronically locally.
+                    </p>
+
+                </div>
+
+                <span class="arrow">
+                    →
+                </span>
+
+            </a>
+
+        </div>
+
+    </section>
+
+    <br>
+
+    <!-- Developer Tools -->
+
+    <section>
+
+        <p class="section-title">
+            Developer Tools
+        </p>
+
+        <div class="tools">
+
+
+            <a
+                href="devtools/quick_links.html"
+                class="tool"
+            >
+
+                <div class="tool-icon">
+                    🔗
+                </div>
+
+                <div class="tool-content">
+
+                    <h2 class="tool-title">
+                        Quick Links
+                    </h2>
+
+                    <p class="tool-description">
+                        Manage your frequently accessed links.
+                    </p>
+
+                </div>
+
+                <span class="arrow">
+                    →
+                </span>
+
+            </a>
+
+
+            <a
+                href="devtools/json_formatter.html"
+                class="tool"
+            >
+
+                <div class="tool-icon">
+                    {" "}
+                </div>
+
+                <div class="tool-content">
+
+                    <h2 class="tool-title">
+                        JSON / XML Formatter
+                    </h2>
+
+                    <p class="tool-description">
+                        Format, inspect and work with
+                        structured data locally.
+                    </p>
+
+                </div>
+
+                <span class="arrow">
+                    →
+                </span>
+
+            </a>
+            
+        </div>
+
+    </section>
+
+
+    <!-- Footer -->
+
+    <footer class="footer">
+
+        Files are processed locally in your browser.
+        No document uploads are required.
+
+    </footer>
+
+</div>
+
+</body>
+</html>

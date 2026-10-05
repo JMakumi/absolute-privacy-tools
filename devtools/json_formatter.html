@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JSON & XML Formatter · Local Developer & Business Tools</title>
+
+<style>
+:root{
+    --bg:#f4f6f9;
+    --card:#ffffff;
+    --text:#172033;
+    --muted:#667085;
+    --border:#e4e7ec;
+    --primary:#2563eb;
+    --primary-dark:#1d4ed8;
+    --success:#067647;
+    --success-dark:#05603a;
+    --danger:#b42318;
+    --danger-bg:#fef3f2;
+    --soft:#f8fafc;
+    --code-bg:#111827;
+    --code-panel:#0f172a;
+    --code-border:#263244;
+    --code-text:#e5e7eb;
+    --shadow:0 12px 30px rgba(16,24,40,.08);
+}
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    font-family:Arial,Helvetica,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding:32px 18px;
+}
+
+.container{
+    width:min(1200px,100%);
+    margin:0 auto;
+}
+
+.card{
+    background:var(--card);
+    border:1px solid rgba(16,24,40,.06);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:30px;
+}
+
+.header{
+    text-align:center;
+    margin-bottom:26px;
+}
+
+.tool-icon{
+    width:56px;
+    height:56px;
+    margin:0 auto 14px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#eff6ff;
+    color:var(--primary);
+    font-size:25px;
+    font-weight:800;
+}
+
+h1{
+    margin:0 0 8px;
+    font-size:28px;
+    line-height:1.2;
+}
+
+.subtitle{
+    margin:0 auto;
+    max-width:680px;
+    color:var(--muted);
+    font-size:15px;
+    line-height:1.5;
+}
+
+.badge{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    margin-top:14px;
+    padding:7px 11px;
+    border-radius:999px;
+    background:#ecfdf3;
+    color:#067647;
+    font-size:12px;
+    font-weight:700;
+}
+
+.badge::before{
+    content:"";
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:#12b76a;
+}
+
+.toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:14px;
+}
+
+.toolbar-note{
+    color:var(--muted);
+    font-size:12px;
+}
+
+.toolbar-actions{
+    display:flex;
+    gap:7px;
+}
+
+.btn{
+    border:0;
+    border-radius:8px;
+    padding:9px 13px;
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.15s ease;
+}
+
+.btn-primary{
+    background:var(--primary);
+    color:#fff;
+}
+
+.btn-primary:hover{
+    background:var(--primary-dark);
+}
+
+.btn-secondary{
+    background:#fff;
+    border:1px solid var(--border);
+    color:#475467;
+}
+
+.btn-secondary:hover{
+    background:#f9fafb;
+}
+
+.btn-success{
+    background:var(--success);
+    color:#fff;
+}
+
+.btn-success:hover{
+    background:var(--success-dark);
+}
+
+.btn:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+}
+
+.editor-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+}
+
+.panel{
+    min-width:0;
+    height:620px;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    border:1px solid var(--code-border);
+    border-radius:12px;
+    background:var(--code-panel);
+    box-shadow:0 5px 15px rgba(16,24,40,.08);
+}
+
+.panel-header{
+    min-height:48px;
+    padding:10px 13px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    border-bottom:1px solid var(--code-border);
+    background:#111827;
+}
+
+.panel-title-wrap{
+    min-width:0;
+}
+
+.panel-title{
+    display:block;
+    color:#f8fafc;
+    font-size:12px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+}
+
+.panel-subtitle{
+    display:block;
+    margin-top:3px;
+    color:#94a3b8;
+    font-size:10px;
+}
+
+.panel-actions{
+    display:flex;
+    gap:6px;
+}
+
+.code-btn{
+    padding:6px 10px;
+    border-radius:6px;
+    border:1px solid #334155;
+    background:transparent;
+    color:#cbd5e1;
+    font-size:11px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.code-btn:hover{
+    background:#1e293b;
+    color:#fff;
+}
+
+.code-btn.primary{
+    border-color:var(--primary);
+    background:var(--primary);
+    color:#fff;
+}
+
+.code-btn.primary:hover{
+    background:var(--primary-dark);
+}
+
+textarea,
+pre{
+    flex:1;
+    width:100%;
+    min-height:0;
+    margin:0;
+    padding:17px;
+    border:0;
+    outline:0;
+    resize:none;
+    overflow:auto;
+    color:var(--code-text);
+    background:var(--code-panel);
+    font-family:"Cascadia Code","Consolas","Courier New",monospace;
+    font-size:13px;
+    line-height:1.6;
+    tab-size:2;
+}
+
+textarea::placeholder{
+    color:#64748b;
+}
+
+pre{
+    white-space:pre-wrap;
+    word-break:break-word;
+}
+
+pre.error{
+    color:#fca5a5;
+}
+
+.status{
+    display:none;
+    margin-top:14px;
+    padding:11px 13px;
+    border-radius:9px;
+    font-size:13px;
+    line-height:1.4;
+}
+
+.status.visible{
+    display:block;
+}
+
+.status.info{
+    background:#eff6ff;
+    color:#1d4ed8;
+}
+
+.status.success{
+    background:#ecfdf3;
+    color:#067647;
+}
+
+.status.error{
+    background:var(--danger-bg);
+    color:var(--danger);
+}
+
+.footer-note{
+    text-align:center;
+    color:var(--muted);
+    font-size:12px;
+    margin-top:18px;
+}
+
+@media (max-width:850px){
+    .editor-grid{
+        grid-template-columns:1fr;
+    }
+
+    .panel{
+        height:460px;
+    }
+}
+
+@media (max-width:600px){
+    body{
+        padding:18px 12px;
+    }
+
+    .card{
+        padding:20px;
+    }
+
+    h1{
+        font-size:24px;
+    }
+
+    .toolbar{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    .toolbar-actions{
+        width:100%;
+    }
+
+    .toolbar-actions .btn{
+        flex:1;
+    }
+
+    .panel-header{
+        align-items:flex-start;
+    }
+
+    .panel-actions{
+        flex-shrink:0;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<main class="container">
+    <section class="card">
+
+        <header class="header">
+            <div class="tool-icon">{ }</div>
+            <h1>JSON &amp; XML Formatter</h1>
+            <p class="subtitle">
+                Paste raw JSON or XML and format it instantly in your browser.
+                Nothing is uploaded to a server.
+            </p>
+            <div class="badge">Private by design · Local processing</div>
+        </header>
+
+        <div class="toolbar">
+            <span class="toolbar-note">
+                Supports JSON objects, JSON arrays, and XML documents
+            </span>
+
+            <div class="toolbar-actions">
+                <button type="button" class="btn btn-secondary" id="clearBtn">
+                    Clear
+                </button>
+                <button type="button" class="btn btn-primary" id="formatBtn">
+                    Format Code
+                </button>
+            </div>
+        </div>
+
+        <div class="editor-grid">
+
+            <section class="panel">
+                <div class="panel-header">
+                    <div class="panel-title-wrap">
+                        <span class="panel-title">Raw Input</span>
+                        <span class="panel-subtitle">Paste JSON or XML</span>
+                    </div>
+
+                    <div class="panel-actions">
+                        <button type="button" class="code-btn" id="pasteBtn">
+                            Paste
+                        </button>
+                    </div>
+                </div>
+
+                <textarea
+                    id="rawInput"
+                    spellcheck="false"
+                    placeholder="Paste your JSON or XML here..."
+                    aria-label="Raw JSON or XML input"
+                ></textarea>
+            </section>
+
+            <section class="panel">
+                <div class="panel-header">
+                    <div class="panel-title-wrap">
+                        <span class="panel-title" id="outputType">
+                            Formatted Output
+                        </span>
+                        <span class="panel-subtitle" id="outputMeta">
+                            Waiting for input
+                        </span>
+                    </div>
+
+                    <div class="panel-actions">
+                        <button type="button" class="code-btn" id="copyBtn">
+                            Copy
+                        </button>
+
+                        <button type="button" class="code-btn" id="downloadBtn">
+                            Save
+                        </button>
+                    </div>
+                </div>
+
+                <pre id="formattedOutput">Your formatted code will appear here...</pre>
+            </section>
+
+        </div>
+
+        <div class="status" id="status"></div>
+
+    </section>
+
+    <div class="footer-note">
+        Your code stays on this device and is processed entirely in your browser.
+    </div>
+</main>
+
+<script>
+"use strict";
+
+const rawInput = document.getElementById("rawInput");
+const formattedOutput = document.getElementById("formattedOutput");
+const outputType = document.getElementById("outputType");
+const outputMeta = document.getElementById("outputMeta");
+
+const formatBtn = document.getElementById("formatBtn");
+const clearBtn = document.getElementById("clearBtn");
+const pasteBtn = document.getElementById("pasteBtn");
+const copyBtn = document.getElementById("copyBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+
+const status = document.getElementById("status");
+
+let lastFormattedText = "";
+let lastFormatType = "";
+
+function setStatus(message, type = "info") {
+    status.textContent = message;
+    status.className = `status visible ${type}`;
+}
+
+function clearStatus() {
+    status.textContent = "";
+    status.className = "status";
+}
+
+function formatJSON(jsonString) {
+    const jsonObject = JSON.parse(jsonString);
+    return JSON.stringify(jsonObject, null, 2);
+}
+
+function formatXML(xmlString) {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlString, "application/xml");
+
+    const parserError = xmlDoc.querySelector("parsererror");
+
+    if (parserError) {
+        throw new Error("Invalid XML. Please check the document syntax.");
+    }
+
+    const serializer = new XMLSerializer();
+    const rawXML = serializer.serializeToString(xmlDoc);
+
+    const tokens = rawXML
+        .replace(/>\s*</g, "><")
+        .replace(/(>)(<)(\/*)/g, "$1\n$2$3")
+        .split("\n")
+        .filter(line => line.trim());
+
+    let formatted = "";
+    let indent = 0;
+
+    const indentString = "  ";
+
+    tokens.forEach(token => {
+        const line = token.trim();
+
+        if (/^<\//.test(line)) {
+            indent = Math.max(0, indent - 1);
+        }
+
+        formatted += indentString.repeat(indent) + line + "\n";
+
+        if (
+            /^<[^!?/][^>]*[^/]?>$/.test(line) &&
+            !/<\/[^>]+>$/.test(line)
+        ) {
+            indent++;
+        }
+    });
+
+    return formatted.trim();
+}
+
+function detectFormat(input) {
+    if (input.startsWith("{") || input.startsWith("[")) {
+        return "JSON";
+    }
+
+    if (input.startsWith("<")) {
+        return "XML";
+    }
+
+    return null;
+}
+
+function processFormatting() {
+    const input = rawInput.value.trim();
+
+    formattedOutput.classList.remove("error");
+
+    if (!input) {
+        formattedOutput.textContent =
+            "Your formatted code will appear here...";
+        outputType.textContent = "Formatted Output";
+        outputMeta.textContent = "Waiting for input";
+        lastFormattedText = "";
+        lastFormatType = "";
+        clearStatus();
+        return;
+    }
+
+    const format = detectFormat(input);
+
+    if (!format) {
+        formattedOutput.textContent =
+            "Unrecognized format. Please provide JSON beginning with '{' or '[', or XML beginning with '<'.";
+        formattedOutput.classList.add("error");
+        outputType.textContent = "Invalid Input";
+        outputMeta.textContent = "Unknown format";
+        lastFormattedText = "";
+        lastFormatType = "";
+
+        setStatus(
+            "Unable to detect the input format.",
+            "error"
+        );
+
+        return;
+    }
+
+    try {
+        let formatted;
+
+        if (format === "JSON") {
+            formatted = formatJSON(input);
+        } else {
+            formatted = formatXML(input);
+        }
+
+        formattedOutput.textContent = formatted;
+        outputType.textContent = `Formatted ${format}`;
+        outputMeta.textContent =
+            `${formatted.split("\n").length} lines`;
+
+        lastFormattedText = formatted;
+        lastFormatType = format;
+
+        setStatus(
+            `${format} formatted successfully.`,
+            "success"
+        );
+
+    } catch (error) {
+        formattedOutput.textContent =
+            format === "JSON"
+                ? `Invalid JSON: ${error.message}`
+                : `Invalid XML: ${error.message}`;
+
+        formattedOutput.classList.add("error");
+
+        outputType.textContent = `Invalid ${format}`;
+        outputMeta.textContent = "Please check syntax";
+
+        lastFormattedText = "";
+        lastFormatType = "";
+
+        setStatus(
+            format === "JSON"
+                ? `Invalid JSON: ${error.message}`
+                : `Invalid XML: ${error.message}`,
+            "error"
+        );
+    }
+}
+
+async function pasteInput() {
+    try {
+        const text = await navigator.clipboard.readText();
+
+        if (!text) {
+            setStatus("Clipboard is empty.", "info");
+            return;
+        }
+
+        rawInput.value = text;
+        processFormatting();
+        rawInput.focus();
+
+    } catch (error) {
+        setStatus(
+            "Clipboard access was blocked. Paste using Ctrl+V instead.",
+            "error"
+        );
+    }
+}
+
+async function copyOutput() {
+    if (!lastFormattedText) {
+        setStatus("There is no valid formatted output to copy.", "error");
+        return;
+    }
+
+    try {
+        await navigator.clipboard.writeText(lastFormattedText);
+
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = "Copied!";
+
+        setStatus("Formatted code copied to the clipboard.", "success");
+
+        setTimeout(() => {
+            copyBtn.textContent = originalText;
+        }, 1600);
+
+    } catch (error) {
+        setStatus(
+            "Unable to copy automatically. Select the output and copy it manually.",
+            "error"
+        );
+    }
+}
+
+function downloadOutput() {
+    if (!lastFormattedText) {
+        setStatus("There is no valid formatted output to save.", "error");
+        return;
+    }
+
+    const extension = lastFormatType === "XML" ? "xml" : "json";
+
+    const blob = new Blob(
+        [lastFormattedText],
+        { type: extension === "xml" ? "application/xml" : "application/json" }
+    );
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = `formatted.${extension}`;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    URL.revokeObjectURL(url);
+
+    setStatus(
+        `Formatted ${lastFormatType} saved successfully.`,
+        "success"
+    );
+}
+
+function clearEditor() {
+    rawInput.value = "";
+
+    formattedOutput.classList.remove("error");
+    formattedOutput.textContent =
+        "Your formatted code will appear here...";
+
+    outputType.textContent = "Formatted Output";
+    outputMeta.textContent = "Waiting for input";
+
+    lastFormattedText = "";
+    lastFormatType = "";
+
+    clearStatus();
+    rawInput.focus();
+}
+
+formatBtn.addEventListener("click", processFormatting);
+rawInput.addEventListener("input", processFormatting);
+
+clearBtn.addEventListener("click", clearEditor);
+pasteBtn.addEventListener("click", pasteInput);
+copyBtn.addEventListener("click", copyOutput);
+downloadBtn.addEventListener("click", downloadOutput);
+
+rawInput.addEventListener("keydown", event => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+        event.preventDefault();
+        processFormatting();
+    }
+
+    if (event.key === "Tab") {
+        event.preventDefault();
+
+        const start = rawInput.selectionStart;
+        const end = rawInput.selectionEnd;
+
+        rawInput.value =
+            rawInput.value.substring(0, start) +
+            "  " +
+            rawInput.value.substring(end);
+
+        rawInput.selectionStart =
+            rawInput.selectionEnd = start + 2;
+    }
+});
+</script>
+
+</body>
+</html>

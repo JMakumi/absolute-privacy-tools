@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Links</title>
+
+    <style>
+        :root {
+            --bg: #f4f6f8;
+            --text: #17202a;
+            --muted: #667085;
+            --border: #e4e7ec;
+            --border-strong: #d0d5dd;
+            --primary: #101828;
+            --primary-hover: #1d2939;
+            --success: #067647;
+            --success-dark: #05603a;
+            --danger: #b42318;
+            --soft: #f8f9fc;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 40px 16px;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 26px;
+        }
+
+        .tool-icon {
+            width: 58px;
+            height: 58px;
+            margin: 0 auto 14px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eff6ff;
+            font-size: 28px;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 30px;
+        }
+
+        .subtitle {
+            margin: 0 auto 14px;
+            max-width: 650px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .badge {
+            display: inline-flex;
+            padding: 7px 11px;
+            border-radius: 999px;
+            background: #ecfdf3;
+            color: var(--success);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 5px 20px rgba(16, 24, 40, 0.06);
+            margin-bottom: 18px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 19px;
+        }
+
+        .card-header p {
+            margin: 5px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-strong);
+            border-radius: 8px;
+            font: inherit;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #667085;
+            box-shadow: 0 0 0 3px rgba(102, 112, 133, 0.10);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        button {
+            border: 0;
+            border-radius: 8px;
+            padding: 11px 16px;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .secondary {
+            background: #f2f4f7;
+            color: var(--text);
+        }
+
+        .secondary:hover {
+            background: #e4e7ec;
+        }
+
+        .danger {
+            color: var(--danger);
+            background: #fff;
+            border: 1px solid #fecdca;
+        }
+
+        .danger:hover {
+            background: #fef3f2;
+        }
+
+        .link-groups {
+            display: grid;
+            gap: 18px;
+        }
+
+        .group {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .group-title {
+            padding: 13px 15px;
+            background: var(--soft);
+            border-bottom: 1px solid var(--border);
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .links {
+            padding: 8px;
+        }
+
+        .link-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 10px;
+            border-radius: 8px;
+        }
+
+        .link-row:hover {
+            background: #f8fafc;
+        }
+
+        .link-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .link-name {
+            display: block;
+            color: #175cd3;
+            font-weight: 600;
+            text-decoration: none;
+            margin-bottom: 4px;
+        }
+
+        .link-name:hover {
+            text-decoration: underline;
+        }
+
+        .link-url {
+            display: block;
+            color: var(--muted);
+            font-size: 12px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .link-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .icon-btn {
+            padding: 7px 9px;
+            background: #f2f4f7;
+            color: var(--text);
+            font-size: 12px;
+        }
+
+        .icon-btn:hover {
+            background: #e4e7ec;
+        }
+
+        .empty {
+            padding: 28px 15px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .footer-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .footer-note {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .toast {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            display: none;
+            padding: 12px 16px;
+            background: #101828;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 13px;
+            box-shadow: 0 8px 25px rgba(16, 24, 40, 0.18);
+        }
+
+        .toast.visible {
+            display: block;
+        }
+
+        @media (max-width: 650px) {
+            body {
+                padding: 20px 10px;
+            }
+
+            .card {
+                padding: 18px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full {
+                grid-column: auto;
+            }
+
+            .link-row {
+                align-items: flex-start;
+            }
+
+            .link-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="app">
+
+    <header class="header">
+        <div class="tool-icon">🔗</div>
+        <h1>Quick Links</h1>
+        <p class="subtitle">
+            Keep frequently used business, development and environment URLs
+            in one convenient place.
+        </p>
+        <div class="badge">Private by design · Stored locally</div>
+    </header>
+
+    <section class="card">
+
+        <div class="card-header">
+            <div>
+                <h2 id="formTitle">Add a link</h2>
+                <p>Create and configure your own shortcuts.</p>
+            </div>
+        </div>
+
+        <form id="linkForm">
+
+            <div class="form-grid">
+
+                <div>
+                    <label for="linkName">Link name</label>
+                    <input
+                        id="linkName"
+                        type="text"
+                        placeholder="e.g. Kenya / SS"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label for="groupName">Group</label>
+                    <input
+                        id="groupName"
+                        type="text"
+                        placeholder="e.g. Finacle"
+                        required
+                    >
+                </div>
+
+                <div class="full">
+                    <label for="linkUrl">URL</label>
+                    <input
+                        id="linkUrl"
+                        type="url"
+                        placeholder="https://example.com/"
+                        required
+                    >
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <button class="primary" type="submit" id="saveBtn">
+                    Add link
+                </button>
+
+                <button
+                    class="secondary"
+                    type="button"
+                    id="cancelBtn"
+                    hidden
+                >
+                    Cancel
+                </button>
+            </div>
+
+        </form>
+
+    </section>
+
+    <section class="card">
+
+        <div class="card-header">
+            <div>
+                <h2>Your links</h2>
+                <p>Edit, remove or open any configured link.</p>
+            </div>
+        </div>
+
+        <div class="link-groups" id="linkGroups"></div>
+
+    </section>
+
+    <section class="card">
+
+        <div class="footer-actions">
+
+            <div class="footer-note">
+                Links are stored in your browser using local storage.
+                Nothing is uploaded to a server.
+            </div>
+
+            <button class="danger" type="button" id="resetBtn">
+                Clear all links
+            </button>
+
+        </div>
+
+    </section>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    const STORAGE_KEY = "quickLinks";
+
+    const defaultLinks = [
+        {
+            id: crypto.randomUUID(),
+            group: "Example",
+            name: "Example Link",
+            url: "https://example.com/"
+        }
+    ];
+
+    let links = loadLinks();
+    let editingId = null;
+
+    const form = document.getElementById("linkForm");
+    const linkName = document.getElementById("linkName");
+    const groupName = document.getElementById("groupName");
+    const linkUrl = document.getElementById("linkUrl");
+    const saveBtn = document.getElementById("saveBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const formTitle = document.getElementById("formTitle");
+    const linkGroups = document.getElementById("linkGroups");
+    const resetBtn = document.getElementById("resetBtn");
+    const toast = document.getElementById("toast");
+
+    function loadLinks() {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            return saved ? JSON.parse(saved) : structuredClone(defaultLinks);
+        } catch {
+            return structuredClone(defaultLinks);
+        }
+    }
+
+    function saveLinks() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(links));
+    }
+
+    function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add("visible");
+
+        clearTimeout(showToast.timer);
+
+        showToast.timer = setTimeout(() => {
+            toast.classList.remove("visible");
+        }, 2200);
+    }
+
+    function renderLinks() {
+        linkGroups.innerHTML = "";
+
+        if (!links.length) {
+            linkGroups.innerHTML = `
+                <div class="empty">
+                    No links configured yet. Add your first link above.
+                </div>
+            `;
+            return;
+        }
+
+        const groups = {};
+
+        links.forEach(link => {
+            const group = link.group.trim() || "Other";
+
+            if (!groups[group]) {
+                groups[group] = [];
+            }
+
+            groups[group].push(link);
+        });
+
+        Object.entries(groups).forEach(([groupName, groupLinks]) => {
+            const group = document.createElement("div");
+            group.className = "group";
+
+            const title = document.createElement("div");
+            title.className = "group-title";
+            title.textContent = groupName;
+
+            const list = document.createElement("div");
+            list.className = "links";
+
+            groupLinks.forEach(link => {
+                const row = document.createElement("div");
+                row.className = "link-row";
+
+                const info = document.createElement("div");
+                info.className = "link-info";
+
+                const anchor = document.createElement("a");
+                anchor.className = "link-name";
+                anchor.href = link.url;
+                anchor.target = "_blank";
+                anchor.rel = "noopener noreferrer";
+                anchor.textContent = link.name;
+
+                const url = document.createElement("span");
+                url.className = "link-url";
+                url.textContent = link.url;
+
+                info.append(anchor, url);
+
+                const actions = document.createElement("div");
+                actions.className = "link-actions";
+
+                const edit = document.createElement("button");
+                edit.className = "icon-btn";
+                edit.type = "button";
+                edit.textContent = "Edit";
+                edit.onclick = () => startEdit(link.id);
+
+                const remove = document.createElement("button");
+                remove.className = "icon-btn";
+                remove.type = "button";
+                remove.textContent = "Delete";
+                remove.onclick = () => deleteLink(link.id);
+
+                actions.append(edit, remove);
+                row.append(info, actions);
+                list.appendChild(row);
+            });
+
+            group.append(title, list);
+            linkGroups.appendChild(group);
+        });
+    }
+
+    form.addEventListener("submit", event => {
+        event.preventDefault();
+
+        const name = linkName.value.trim();
+        const group = groupName.value.trim();
+        let url = linkUrl.value.trim();
+
+        if (!name || !group || !url) {
+            return;
+        }
+
+        if (!/^https?:\/\//i.test(url)) {
+            url = "https://" + url;
+        }
+
+        try {
+            new URL(url);
+        } catch {
+            showToast("Please enter a valid URL.");
+            return;
+        }
+
+        if (editingId) {
+            const link = links.find(item => item.id === editingId);
+
+            if (link) {
+                link.name = name;
+                link.group = group;
+                link.url = url;
+            }
+
+            showToast("Link updated.");
+        } else {
+            links.push({
+                id: crypto.randomUUID(),
+                name,
+                group,
+                url
+            });
+
+            showToast("Link added.");
+        }
+
+        saveLinks();
+        renderLinks();
+        resetForm();
+    });
+
+    function startEdit(id) {
+        const link = links.find(item => item.id === id);
+
+        if (!link) {
+            return;
+        }
+
+        editingId = id;
+
+        linkName.value = link.name;
+        groupName.value = link.group;
+        linkUrl.value = link.url;
+
+        formTitle.textContent = "Edit link";
+        saveBtn.textContent = "Save changes";
+        cancelBtn.hidden = false;
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+        linkName.focus();
+    }
+
+    function deleteLink(id) {
+        const link = links.find(item => item.id === id);
+
+        if (!link) {
+            return;
+        }
+
+        if (!confirm(`Delete "${link.name}"?`)) {
+            return;
+        }
+
+        links = links.filter(item => item.id !== id);
+
+        saveLinks();
+        renderLinks();
+
+        if (editingId === id) {
+            resetForm();
+        }
+
+        showToast("Link deleted.");
+    }
+
+    function resetForm() {
+        editingId = null;
+        form.reset();
+
+        formTitle.textContent = "Add a link";
+        saveBtn.textContent = "Add link";
+        cancelBtn.hidden = true;
+    }
+
+    cancelBtn.addEventListener("click", resetForm);
+
+    resetBtn.addEventListener("click", () => {
+        if (!confirm("Are you sure you want to clear all links? This action is not reversible!")) {
+            return;
+        }
+
+        links = structuredClone(defaultLinks);
+        saveLinks();
+        renderLinks();
+        resetForm();
+
+        showToast("Default links restored.");
+    });
+
+    renderLinks();
+</script>
+
+</body>
+</html>

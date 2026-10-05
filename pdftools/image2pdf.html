@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image to PDF Converter</title>
+
+<style>
+:root{
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --border:#e4e9f0;
+    --text:#17212f;
+    --muted:#687386;
+    --primary:#2563eb;
+    --primary-dark:#1d4ed8;
+    --success:#067647;
+    --success-bg:#ecfdf3;
+    --danger:#b42318;
+    --danger-bg:#fef3f2;
+    --shadow:0 10px 30px rgba(16,24,40,.08);
+}
+
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding:32px 20px 50px;
+}
+
+.container{
+    width:min(920px,100%);
+    margin:0 auto;
+}
+
+.header{
+    text-align:center;
+    margin-bottom:24px;
+}
+
+.tool-icon{
+    width:58px;
+    height:58px;
+    margin:0 auto 14px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#eff6ff;
+    color:var(--primary);
+    font-size:28px;
+    font-weight:700;
+}
+
+h1{
+    margin:0;
+    font-size:30px;
+    line-height:1.2;
+}
+
+.subtitle{
+    margin:9px auto 14px;
+    max-width:650px;
+    color:var(--muted);
+    font-size:15px;
+    line-height:1.6;
+}
+
+.privacy{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    padding:7px 11px;
+    border-radius:999px;
+    background:var(--success-bg);
+    color:var(--success);
+    font-size:12px;
+    font-weight:700;
+}
+
+.card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:24px;
+}
+
+.drop-zone{
+    border:2px dashed #cbd5e1;
+    border-radius:14px;
+    padding:34px 20px;
+    text-align:center;
+    background:#fafcff;
+    transition:.15s ease;
+    cursor:pointer;
+}
+
+.drop-zone:hover,
+.drop-zone.dragover{
+    border-color:var(--primary);
+    background:#f5f9ff;
+}
+
+.drop-icon{
+    font-size:34px;
+    margin-bottom:10px;
+}
+
+.drop-zone strong{
+    display:block;
+    font-size:16px;
+    margin-bottom:6px;
+}
+
+.drop-zone span{
+    color:var(--muted);
+    font-size:13px;
+}
+
+#imgInput{
+    display:none;
+}
+
+.button-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:14px;
+}
+
+button,
+.download{
+    border:none;
+    border-radius:10px;
+    padding:13px 16px;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.15s ease;
+    text-align:center;
+    text-decoration:none;
+}
+
+button:disabled{
+    opacity:.55;
+    cursor:not-allowed;
+}
+
+.primary{
+    background:var(--primary);
+    color:#fff;
+}
+
+.primary:hover:not(:disabled){
+    background:var(--primary-dark);
+}
+
+.secondary{
+    background:#eef2f7;
+    color:#344054;
+}
+
+.secondary:hover:not(:disabled){
+    background:#e2e8f0;
+}
+
+.danger{
+    background:var(--danger-bg);
+    color:var(--danger);
+}
+
+.section-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin:24px 0 12px;
+}
+
+.section-header h2{
+    margin:0;
+    font-size:17px;
+}
+
+.file-count{
+    color:var(--muted);
+    font-size:13px;
+}
+
+.image-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.empty{
+    padding:24px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    text-align:center;
+    color:var(--muted);
+    background:#fafafa;
+    font-size:14px;
+}
+
+.image-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:#fff;
+}
+
+.thumbnail{
+    width:58px;
+    height:58px;
+    border-radius:8px;
+    object-fit:cover;
+    background:#f1f5f9;
+    flex:0 0 auto;
+}
+
+.image-info{
+    min-width:0;
+    flex:1;
+}
+
+.image-name{
+    font-size:14px;
+    font-weight:700;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.image-meta{
+    margin-top:4px;
+    color:var(--muted);
+    font-size:12px;
+}
+
+.actions{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+}
+
+.action-btn{
+    padding:8px 10px;
+    font-size:12px;
+    background:#f2f4f7;
+    color:#344054;
+}
+
+.action-btn:hover{
+    background:#e4e7ec;
+}
+
+.remove-btn{
+    color:var(--danger);
+}
+
+.convert-area{
+    margin-top:20px;
+    padding-top:20px;
+    border-top:1px solid var(--border);
+}
+
+.convert-btn{
+    width:100%;
+    background:var(--primary);
+    color:#fff;
+    font-size:16px;
+    padding:15px;
+}
+
+.convert-btn:hover:not(:disabled){
+    background:var(--primary-dark);
+}
+
+.status{
+    display:none;
+    margin-top:14px;
+    padding:12px 14px;
+    border-radius:10px;
+    font-size:13px;
+    line-height:1.5;
+}
+
+.status.success{
+    display:block;
+    color:var(--success);
+    background:var(--success-bg);
+}
+
+.status.error{
+    display:block;
+    color:var(--danger);
+    background:var(--danger-bg);
+}
+
+.progress{
+    display:none;
+    margin-top:14px;
+}
+
+.progress-bar{
+    height:8px;
+    overflow:hidden;
+    border-radius:999px;
+    background:#e9eef5;
+}
+
+.progress-fill{
+    width:0;
+    height:100%;
+    background:var(--primary);
+    transition:width .2s ease;
+}
+
+.progress-text{
+    margin-top:7px;
+    text-align:center;
+    color:var(--muted);
+    font-size:12px;
+}
+
+.result{
+    display:none;
+    margin-top:24px;
+    padding-top:24px;
+    border-top:1px solid var(--border);
+}
+
+.result h2{
+    margin:0 0 12px;
+    font-size:17px;
+}
+
+iframe{
+    width:100%;
+    height:560px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:#f8fafc;
+}
+
+.download{
+    display:block;
+    width:100%;
+    margin-top:12px;
+    background:var(--success);
+    color:#fff;
+    font-size:16px;
+    padding:15px 20px;
+}
+
+.download:hover{
+    background:#05603a;
+}
+
+.footer{
+    margin-top:18px;
+    text-align:center;
+    color:var(--muted);
+    font-size:12px;
+}
+
+@media(max-width:650px){
+    body{padding:20px 12px 36px}
+    .card{padding:16px}
+    h1{font-size:25px}
+    .button-row{grid-template-columns:1fr}
+    .image-item{align-items:flex-start}
+    .actions{width:100%; margin-top:6px; justify-content:flex-start}
+    .image-item{flex-wrap:wrap}
+    iframe{height:450px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header class="header">
+        <div class="tool-icon">🖼️</div>
+        <h1>Image → PDF Converter</h1>
+        <p class="subtitle">
+            Convert one or more images into a PDF document directly in your browser.
+            Arrange your images, preview them, and download the finished PDF.
+        </p>
+        <div class="privacy">🔒 Private by design · Local processing</div>
+    </header>
+
+    <main class="card">
+
+        <div class="drop-zone" id="dropZone">
+            <div class="drop-icon">📁</div>
+            <strong>Drop images here</strong>
+            <span>or click to choose multiple images</span>
+            <input type="file" id="imgInput" accept="image/*" multiple>
+        </div>
+
+        <div class="button-row">
+            <button class="primary" type="button" onclick="openFilePicker()">
+                Add Images
+            </button>
+            <button class="secondary" type="button" onclick="clearImages()">
+                Clear All
+            </button>
+        </div>
+
+        <div class="section-header">
+            <h2>Selected Images</h2>
+            <span class="file-count" id="fileCount">0 images</span>
+        </div>
+
+        <div class="image-list" id="list">
+            <div class="empty">No images selected yet.</div>
+        </div>
+
+        <div class="convert-area">
+            <button class="convert-btn" id="convertBtn" type="button" onclick="convertToPDF()" disabled>
+                Convert to PDF
+            </button>
+
+            <div class="progress" id="progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Preparing PDF...</div>
+            </div>
+
+            <div class="status" id="status"></div>
+        </div>
+
+        <section class="result" id="result">
+            <h2>PDF Preview</h2>
+            <iframe id="preview" title="Generated PDF preview"></iframe>
+            <a class="download" id="downloadBtn" href="#" download="images.pdf">
+                Download PDF
+            </a>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        Your images are processed locally in your browser and are not uploaded to a server.
+    </footer>
+
+</div>
+
+<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+
+<script>
+let images = [];
+let pdfUrl = null;
+
+const input = document.getElementById("imgInput");
+const dropZone = document.getElementById("dropZone");
+
+function openFilePicker(){
+    input.click();
+}
+
+input.addEventListener("change", () => {
+    addImages(input.files);
+    input.value = "";
+});
+
+dropZone.addEventListener("click", (event) => {
+    if(event.target !== input){
+        input.click();
+    }
+});
+
+["dragenter", "dragover"].forEach(eventName => {
+    dropZone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        dropZone.classList.add("dragover");
+    });
+});
+
+["dragleave", "drop"].forEach(eventName => {
+    dropZone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        dropZone.classList.remove("dragover");
+    });
+});
+
+dropZone.addEventListener("drop", (event) => {
+    addImages(event.dataTransfer.files);
+});
+
+function addImages(fileList){
+    const files = Array.from(fileList || []).filter(file =>
+        file.type.startsWith("image/")
+    );
+
+    if(!files.length){
+        showStatus("Please select one or more valid image files.", "error");
+        return;
+    }
+
+    images.push(...files);
+    hideResult();
+    render();
+    clearStatus();
+}
+
+function render(){
+    const list = document.getElementById("list");
+    const count = document.getElementById("fileCount");
+    const convertBtn = document.getElementById("convertBtn");
+
+    count.textContent = `${images.length} image${images.length === 1 ? "" : "s"}`;
+    convertBtn.disabled = images.length === 0;
+
+    list.innerHTML = "";
+
+    if(!images.length){
+        list.innerHTML = '<div class="empty">No images selected yet.</div>';
+        return;
+    }
+
+    images.forEach((img, index) => {
+        const item = document.createElement("div");
+        item.className = "image-item";
+
+        const thumbnail = document.createElement("img");
+        thumbnail.className = "thumbnail";
+        thumbnail.src = URL.createObjectURL(img);
+        thumbnail.alt = img.name;
+
+        const info = document.createElement("div");
+        info.className = "image-info";
+
+        const name = document.createElement("div");
+        name.className = "image-name";
+        name.textContent = `${index + 1}. ${img.name}`;
+
+        const meta = document.createElement("div");
+        meta.className = "image-meta";
+        meta.textContent = formatBytes(img.size);
+
+        info.appendChild(name);
+        info.appendChild(meta);
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        const up = createActionButton("↑", () => moveImage(index, -1));
+        const down = createActionButton("↓", () => moveImage(index, 1));
+        const preview = createActionButton("Preview", () => previewImage(img));
+        const remove = createActionButton("Remove", () => removeImage(index));
+
+        up.disabled = index === 0;
+        down.disabled = index === images.length - 1;
+        remove.classList.add("remove-btn");
+
+        actions.append(up, down, preview, remove);
+        item.append(thumbnail, info, actions);
+        list.appendChild(item);
+    });
+}
+
+function createActionButton(label, handler){
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "action-btn";
+    button.textContent = label;
+    button.addEventListener("click", handler);
+    return button;
+}
+
+function moveImage(index, direction){
+    const newIndex = index + direction;
+
+    if(newIndex < 0 || newIndex >= images.length){
+        return;
+    }
+
+    [images[index], images[newIndex]] = [images[newIndex], images[index]];
+    hideResult();
+    render();
+}
+
+function removeImage(index){
+    images.splice(index, 1);
+    hideResult();
+    render();
+}
+
+function clearImages(){
+    images = [];
+    hideResult();
+    clearStatus();
+    render();
+}
+
+function previewImage(file){
+    const url = URL.createObjectURL(file);
+    window.open(url, "_blank");
+}
+
+function formatBytes(bytes){
+    if(bytes === 0) return "0 Bytes";
+
+    const units = ["Bytes", "KB", "MB", "GB"];
+    const index = Math.floor(Math.log(bytes) / Math.log(1024));
+
+    return `${(bytes / Math.pow(1024, index)).toFixed(index === 0 ? 0 : 2)} ${units[index]}`;
+}
+
+async function convertToPDF(){
+    if(!images.length){
+        showStatus("Add at least one image before converting.", "error");
+        return;
+    }
+
+    const convertBtn = document.getElementById("convertBtn");
+    const progress = document.getElementById("progress");
+    const progressFill = document.getElementById("progressFill");
+    const progressText = document.getElementById("progressText");
+
+    convertBtn.disabled = true;
+    progress.style.display = "block";
+    clearStatus();
+    hideResult();
+
+    try{
+        const pdfDoc = await PDFLib.PDFDocument.create();
+
+        for(let i = 0; i < images.length; i++){
+            const img = images[i];
+
+            progressText.textContent =
+                `Processing image ${i + 1} of ${images.length}...`;
+
+            const bytes = await img.arrayBuffer();
+
+            let embedded;
+
+            if(img.type === "image/png"){
+                embedded = await pdfDoc.embedPng(bytes);
+            } else if(img.type === "image/jpeg"){
+                embedded = await pdfDoc.embedJpg(bytes);
+            } else {
+                embedded = await embedOtherImage(pdfDoc, img);
+            }
+
+            const { width, height } = embedded.scale(1);
+
+            const page = pdfDoc.addPage([width, height]);
+
+            page.drawImage(embedded, {
+                x: 0,
+                y: 0,
+                width,
+                height
+            });
+
+            const percentage = Math.round(((i + 1) / images.length) * 100);
+            progressFill.style.width = `${percentage}%`;
+        }
+
+        progressText.textContent = "Finalizing PDF...";
+
+        const pdfBytes = await pdfDoc.save();
+        const blob = new Blob([pdfBytes], { type:"application/pdf" });
+
+        if(pdfUrl){
+            URL.revokeObjectURL(pdfUrl);
+        }
+
+        pdfUrl = URL.createObjectURL(blob);
+
+        const preview = document.getElementById("preview");
+        const downloadBtn = document.getElementById("downloadBtn");
+        const result = document.getElementById("result");
+
+        preview.src = pdfUrl;
+        downloadBtn.href = pdfUrl;
+        downloadBtn.download = "images.pdf";
+
+        result.style.display = "block";
+        progressFill.style.width = "100%";
+        progressText.textContent = "PDF created successfully.";
+
+        showStatus(
+            `PDF ready. ${images.length} image${images.length === 1 ? "" : "s"} converted successfully (${formatBytes(pdfBytes.length)}).`,
+            "success"
+        );
+
+        result.scrollIntoView({ behavior:"smooth", block:"start" });
+
+    } catch(error){
+        console.error(error);
+        showStatus(
+            error.message || "Unable to create the PDF. Please check your images and try again.",
+            "error"
+        );
+    } finally {
+        convertBtn.disabled = false;
+
+        setTimeout(() => {
+            progress.style.display = "none";
+        }, 900);
+    }
+}
+
+async function embedOtherImage(pdfDoc, file){
+    const bitmap = await createImageBitmap(file);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = bitmap.width;
+    canvas.height = bitmap.height;
+
+    const context = canvas.getContext("2d");
+    context.drawImage(bitmap, 0, 0);
+
+    bitmap.close();
+
+    const blob = await new Promise(resolve =>
+        canvas.toBlob(resolve, "image/jpeg", 0.95)
+    );
+
+    if(!blob){
+        throw new Error(`Unable to process image: ${file.name}`);
+    }
+
+    return pdfDoc.embedJpg(await blob.arrayBuffer());
+}
+
+function showStatus(message, type){
+    const status = document.getElementById("status");
+    status.textContent = message;
+    status.className = `status ${type}`;
+}
+
+function clearStatus(){
+    const status = document.getElementById("status");
+    status.textContent = "";
+    status.className = "status";
+}
+
+function hideResult(){
+    document.getElementById("result").style.display = "none";
+}
+
+render();
+</script>
+
+</body>
+</html>

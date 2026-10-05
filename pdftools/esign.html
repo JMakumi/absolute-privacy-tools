@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced PDF Sign Tool</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f6f9;
+    display:flex;
+    justify-content:center;
+    padding:20px;
+}
+
+.container{
+    width:800px;
+    background:#fff;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+}
+
+.row{
+    display:flex;
+    gap:10px;
+}
+
+.left, .right{
+    flex:1;
+}
+
+canvas{
+    border:1px solid #ddd;
+    width:100%;
+    height:150px;
+    touch-action:none;
+}
+
+input, button, select{
+    width:100%;
+    padding:10px;
+    margin-top:8px;
+}
+
+button{
+    border:none;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+.primary{background:#007bff;color:#fff}
+.success{background:#28a745;color:#fff}
+.clear{background:#dc3545;color:#fff}
+
+#pdfView{
+    width:100%;
+    height:500px;
+    border:1px solid #ccc;
+    margin-top:10px;
+}
+
+.signature-box{
+    position:absolute;
+    cursor:move;
+    background:rgba(255,255,255,0.8);
+    padding:5px;
+    border:1px dashed #333;
+    font-family:cursive;
+}
+.pdf-wrapper{
+    position:relative;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1 style="color: #dc3545;">eSign is still under development. Some features may not work!</h1>
+
+<h2>Advanced PDF Sign Tool</h2>
+
+<div class="row">
+
+<div class="left">
+
+<input type="file" id="pdfInput" accept=".pdf">
+
+<select id="pageSelect"></select>
+
+<h4>Draw Signature</h4>
+<canvas id="pad"></canvas>
+<button class="clear" onclick="clearPad()">Clear Draw</button>
+
+<h4>OR Type Signature</h4>
+<input type="text" id="typedSig" placeholder="Type your name">
+
+<button class="primary" onclick="addSignature()">Generate Signature</button>
+
+</div>
+
+<div class="right">
+
+<h4>PDF Preview</h4>
+<div class="pdf-wrapper" id="pdfWrapper">
+<iframe id="pdfView"></iframe>
+</div>
+
+<button class="success" onclick="applySignature()">Apply Signature</button>
+
+</div>
+
+</div>
+
+</div>
+
+<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+
+<script>
+const canvas = document.getElementById("pad");
+const ctx = canvas.getContext("2d");
+
+let drawing = false;
+let pdfBytes = null;
+let pdfDocGlobal = null;
+let signatureData = null;
+let sigElement = null;
+let signedUrl = null;
+
+// canvas setup
+canvas.width = canvas.offsetWidth;
+canvas.height = 150;
+
+canvas.addEventListener("mousedown", start);
+canvas.addEventListener("mousemove", draw);
+canvas.addEventListener("mouseup", stop);
+
+function start(e){
+    drawing = true;
+    ctx.beginPath();
+    ctx.moveTo(e.offsetX, e.offsetY);
+}
+
+function draw(e){
+    if(!drawing) return;
+    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.stroke();
+}
+
+function stop(){
+    drawing = false;
+}
+
+function clearPad(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+}
+
+// load PDF
+document.getElementById("pdfInput").addEventListener("change", async (e)=>{
+    const file = e.target.files[0];
+
+    pdfBytes = await file.arrayBuffer();
+    pdfDocGlobal = await PDFLib.PDFDocument.load(pdfBytes);
+
+    const pageSelect = document.getElementById("pageSelect");
+    pageSelect.innerHTML = "";
+
+    pdfDocGlobal.getPages().forEach((_, i)=>{
+        const opt = document.createElement("option");
+        opt.value = i;
+        opt.innerText = "Page " + (i+1);
+        pageSelect.appendChild(opt);
+    });
+
+    loadPreview();
+});
+
+function loadPreview(){
+    const blob = new Blob([pdfBytes], {type:"application/pdf"});
+    const url = URL.createObjectURL(blob);
+    document.getElementById("pdfView").src = url;
+}
+
+// create signature
+function addSignature(){
+
+    const typed = document.getElementById("typedSig").value;
+
+    const data = canvas.toDataURL("image/png");
+
+    if(typed){
+        signatureData = { type:"text", value:typed };
+    } else if(!isCanvasBlank(canvas)){
+        signatureData = { type:"image", value:data };
+    } else {
+        alert("Create or type signature first");
+        return;
+    }
+
+    createDraggableSignature(signatureData);
+}
+
+function isCanvasBlank(c){
+    return !c.getContext("2d")
+        .getImageData(0,0,c.width,c.height).data
+        .some(channel => channel !== 0);
+}
+
+// draggable signature
+function createDraggableSignature(sig){
+
+    if(sigElement) sigElement.remove();
+
+    sigElement = document.createElement("div");
+    sigElement.className = "signature-box";
+
+    if(sig.type === "text"){
+        sigElement.innerText = sig.value;
+        sigElement.style.fontSize = "22px";
+        sigElement.style.fontFamily = "cursive";
+    } else {
+        const img = document.createElement("img");
+        img.src = sig.value;
+        img.style.height = "60px";
+        sigElement.appendChild(img);
+    }
+
+    sigElement.style.left = "50px";
+    sigElement.style.top = "50px";
+
+    makeDraggable(sigElement);
+
+    document.getElementById("pdfWrapper").appendChild(sigElement);
+}
+
+// drag logic
+function makeDraggable(el){
+    let offsetX, offsetY, dragging = false;
+
+    el.onmousedown = function(e){
+        dragging = true;
+        offsetX = e.offsetX;
+        offsetY = e.offsetY;
+    };
+
+    document.onmousemove = function(e){
+        if(!dragging) return;
+        el.style.left = (e.pageX - 400 - offsetX) + "px";
+        el.style.top = (e.pageY - 100 - offsetY) + "px";
+    };
+
+    document.onmouseup = function(){
+        dragging = false;
+    };
+}
+
+// apply signature to PDF
+async function applySignature(){
+
+    if(!sigElement){
+        return alert("Create signature first");
+    }
+
+    const pageIndex = parseInt(document.getElementById("pageSelect").value);
+
+    const pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
+
+    const page = pdfDoc.getPages()[pageIndex];
+
+    const rect = sigElement.getBoundingClientRect();
+    const pdfRect = document.getElementById("pdfView").getBoundingClientRect();
+
+    const x = rect.left - pdfRect.left;
+    const y = pdfRect.height - (rect.top - pdfRect.top);
+
+    if(signatureData.type === "text"){
+
+        page.drawText(signatureData.value, {
+            x,
+            y,
+            size: 20
+        });
+
+    } else {
+
+        const img = await pdfDoc.embedPng(signatureData.value);
+
+        page.drawImage(img, {
+            x,
+            y,
+            width: 120,
+            height: 50
+        });
+    }
+
+    const bytes = await pdfDoc.save();
+
+    const blob = new Blob([bytes], {type:"application/pdf"});
+    const url = URL.createObjectURL(blob);
+
+    document.getElementById("pdfView").src = url;
+
+    signedUrl = url;
+
+    alert("Signature applied!");
+}
+</script>
+
+</body>
+</html>
